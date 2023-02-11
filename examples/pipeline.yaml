@@ -1,0 +1,38 @@
+jobs:
+  - name: nanoleaf
+    plan:
+      - task: do-something
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source: {repository: alpine}
+          run:
+            path: sh
+            args:
+              - -exc
+              - |
+                echo hello!
+    on_success:
+      put: my-nanoleaf
+      params:
+        hue: 120
+    on_failure:
+      put: my-nanoleaf
+      params:
+        hue: 360
+
+resources:
+  - name: my-nanoleaf
+    check_every: never
+    type: concourse-nanoleaf
+    source:
+      ip_address: "192.168.x.xxx"
+      api_token: "xxxxxxxxxxxxxxxx"
+
+resource_types:
+  - name: concourse-nanoleaf
+    type: registry-image
+    source:
+      repository: ca5ey32/nanoleaf-colour-concourse-resource
+      tag: 0.0.1
